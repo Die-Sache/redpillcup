@@ -10,7 +10,6 @@ os.chdir(os.path.abspath(os.path.dirname(__file__))) # Change working directory 
 wd = os.getcwd()                                     # working directory
 
 def schedule(intTeams = 4, prt = [], boolSecondRound = True):
-    print(prt)
 
     if not (intTeams % 2) == 0:
         return(False)
