@@ -2,34 +2,35 @@
 Build schedule w/ pairings for the redpill-cup
 Version 0.0.1-alpha by Pfulsk
 This is just the proof of concept.
-The draw is still missing (but very easy to implement)
 """
 
-import pandas as pd
+import os, random, pandas as pd
 
-def schedule(intTeams = 4, boolSecondRound = True):
+os.chdir(os.path.abspath(os.path.dirname(__file__))) # Change working directory to current
+wd = os.getcwd()                                     # working directory
 
-    usedTeams = intTeams
-    if not (usedTeams % 2) == 0:
-        usedTeams += 1
+def schedule(intTeams = 4, prt = [], boolSecondRound = True):
+    print(prt)
 
-    n = usedTeams - 1
-    m = int(usedTeams / 2)
+    if not (intTeams % 2) == 0:
+        return(False)
+
+    n = intTeams - 1
+    m = int(intTeams / 2)
 
     df = pd.DataFrame(columns=['H', 'A', 'RD'])
     
-    for i in range(1,usedTeams):
-        h = usedTeams
+    for i in range(1,intTeams):
+        h = intTeams
         a = i
 
         # home or away
         if not (i % 2) == 0:
             a, h = h, a
 
-        df = pd.concat([df, pd.DataFrame({'H': [h], 'A': [a], 'RD': [i]})], ignore_index=True)
+        df = pd.concat([df, pd.DataFrame({'H': prt[h-1], 'A': prt[a-1], 'RD': [i]})], ignore_index=True)
         
         for k in range(1,m):
-            print(i-k)
             if (i-k) < 0:
                 a = n + (i-k)
             else:
@@ -45,7 +46,7 @@ def schedule(intTeams = 4, boolSecondRound = True):
             if (k % 2) == 0:
                 a, h = h, a
 
-            df = pd.concat([df, pd.DataFrame({'H': [h], 'A': [a], 'RD': [i]})], ignore_index=True)
+            df = pd.concat([df, pd.DataFrame({'H': prt[h-1], 'A': prt[a-1], 'RD': [i]})], ignore_index=True)
 
     if boolSecondRound:
         count = df.shape[0]
@@ -55,5 +56,18 @@ def schedule(intTeams = 4, boolSecondRound = True):
 
     return(df)
 
-df = schedule(4)
+count = 0
+file1 = open('participants.txt', 'r')
+participants = file1.readlines()
+for participant in participants:
+    participants[count] = participant.strip()
+    count += 1
+random.shuffle(participants)
+
+if not(count % 2 == 0):
+    participants.append('NaN')
+    count += 1
+
+df = schedule(count, participants, False)
+
 print(df)
